@@ -1,0 +1,25 @@
+structure dossiers: https://miro.com/app/board/uXjVGsoxJx0=/
+
+24/03/2026
+	Structuration des projets	
+	Apprentissage de l'utilisation des headers
+
+17/03/2026
+	Scéance en chambre (manque de batterie)
+	prise en main de stb_image, fonction img_open écrite et commenté
+	Problème de lenteur du code étrange, VOIR LA PROF (note: le problème est réglé)
+
+10/03/26
+
+	bibliothèque de manipulation d'image trouvée: stb_image
+	tuto: https://solarianprogrammer.com/2019/06/10/c-programming-reading-writing-images-stb_image-libraries/
+
+
+03/03/26
+
+	Refocalisation sur le sujet de l'upscaling, idées trouvées sur la méthode:
+		-implémenter et étudier les différents algorithmes
+		-tester leurs limites pour mieux les caractériser
+		-essayer de les combiner pour qu'ils pallies leurs défauts
+	Recherche de biblio pour la gestion d'images en C:
+		-DevIL en install à tester

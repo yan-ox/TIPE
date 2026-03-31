@@ -1,0 +1,34 @@
+FSR
+	-HLSL/GLSL (shading languages) (synthaxe proche du C)
+		-Shader
+			-grille informatique
+		-pipeline carte graphique
+			-rastérisation
+			-ray tracing
+
+
+make my own upscaler ?
+		-KNN first approach ?
+		-interpolation:
+				interpolation bilinéaire : réduit le contraste: polynômes interpolateurs de Lagrange
+				interpolation bicubic : meilleurs résultats mais plus gourmand
+		-sync and Lanczos resampling : sync : Whittaker–Shannon interpolation formula
+					
+
+
+passage d'image vectorielle à matricielle: problèmes de crénelage
+
+
+
+idées: essayer de chercher quelles images font posent le plus de problème aux algorithmes
+comparer les algorithmes voir leur qualités / défauts et voir pour les combiner ?
+la prof a parler d'arbres de décisions, après analyse on peut tenter d'en faire un pour choisir tt seul
+le meilleur algo suivant l'image ?
+
+
+
+
+
+wikipedia scaling: https://en.wikipedia.org/wiki/Image_scaling
+wikipedia crénelage: https://fr.wikipedia.org/wiki/Cr%C3%A9nelage
+Grenoble INP fichierHeader: https://chamilo.grenoble-inp.fr/courses/ENSE3A13EMAPPSIC/document/resources/FichesPDF/modules_fichierHeader.pdf

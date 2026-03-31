@@ -1,0 +1,8 @@
+fonctionnement des headers:
+#ifndef _BASIC_H
+#define _BASIC_H
+
+prototypes de fonctions, typedef etc...
+#endif
+
+soit compiler le .c en même temps soit compiler avec -c fichier.o puit compiler fichier.o
