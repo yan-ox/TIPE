@@ -79,7 +79,9 @@ img* expand(img* image, int nwidth){
     //
     for (size_t i = 0; i < otp_size; i ++){
         //printf("%d\n", i);
-        output->tab[i * output->channels] = 1;   //Filling every pixel's red color with NULL to keep track of the missing pixels
+        output->tab[i * output->channels] = 1;   //Filling every pixel's red color with 1 to keep track of the missing pixels
+        output->tab[i * output->channels + 1] = 2;
+        output->tab[i * output->channels + 2] = 3;
     }
     //
     for (size_t i = 0; i < img_size; i ++){
