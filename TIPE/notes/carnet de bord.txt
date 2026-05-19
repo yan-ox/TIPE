@@ -1,5 +1,12 @@
 structure dossiers: https://miro.com/app/board/uXjVGsoxJx0=/
 
+05/05/2026
+	ajout de minf, maxf, ind, coor et dist à basics
+	ajout de select_ksort à up_KNN et autres fonctions déjà prévues
+
+28/04/2026
+	img_manage est terminé, on peut passer au méthodes d'approximation (KNN, polynomes interpolateurs etc...)
+
 24/03/2026
 	Structuration des projets	
 	Apprentissage de l'utilisation des headers

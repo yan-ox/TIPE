@@ -6,3 +6,4 @@ prototypes de fonctions, typedef etc...
 #endif
 
 soit compiler le .c en même temps soit compiler avec -c fichier.o puit compiler fichier.o
+ex: gcc ..\..\mine\basics.c -c -o basics.o
