@@ -77,13 +77,6 @@ img* expand(img* image, int nwidth){
     size_t img_size = image->width * image->height;
     size_t otp_size = output->width * output->height;
     //
-    for (size_t i = 0; i < otp_size; i ++){
-        //printf("%d\n", i);
-        output->tab[i * output->channels] = 1;   //Filling every pixel's red color with 1 to keep track of the missing pixels
-        output->tab[i * output->channels + 1] = 2;
-        output->tab[i * output->channels + 2] = 3;
-    }
-    //
     for (size_t i = 0; i < img_size; i ++){
         //Calculates the coordinates
         size_t ic = (int) (i * coef) + ((int) (i / image->width) % 2 == 1); //Calculates horizontal spacing

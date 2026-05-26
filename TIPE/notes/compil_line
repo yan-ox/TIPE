@@ -1,0 +1,1 @@
+KNN: gcc ..\mine\upscalers\up_KNN.c o\basics.o o\img_manage.o -o KNN.exe
