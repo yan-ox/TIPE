@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 typedef struct {
     int* coord;
@@ -42,16 +43,13 @@ int* KNN(int i, img* image, pixlist* basepix, int k){
     int npoint[2];
     //printf("        pre-alldist\n");
     for (int j = 0; j < basepix->size; j ++){
-        ////printf("j: %d, coordk: %d ", j, basepix->coord[j]);
+        //printf("j: %d, coordk: %d \n", j, basepix->coord[j]);
         coor(basepix->coord[j], image->width, npoint);
-        ////printf("        huh\n");
         alldist[j] = basepix->coord[j];
-        ////printf("points:(%d, %d), (%d, %d) dist: %f \n", point[0], point[1], npoint[0], npoint[1], dist(point[0], point[1], npoint[0], npoint[1]));
-        alldist[2 * j] = dist(point[0], point[1], npoint[0], npoint[1]); //We reverse the indices so that we can have an array of distances
+        //printf("points:(%d, %d), (%d, %d) dist: %f \n", point[0], point[1], npoint[0], npoint[1], dist(point[0], point[1], npoint[0], npoint[1]));
+        alldist[basepix->size + j] = dist(point[0], point[1], npoint[0], npoint[1]); //We reverse the indices so that we can have an array of distances
     }
     //Sorting
-    //print_arr(alldist, 2 * basepix->size);
-    //printf("        pre-sort\n");
     select_ksort(alldist, basepix->size, k);
     //Taking the average color found
     //printf("        pre-average\n");
@@ -60,18 +58,30 @@ int* KNN(int i, img* image, pixlist* basepix, int k){
         RGB[j] = 0;
     }
     //printf("        1\n");
+    //int hex = 0;
+    //int RGB1[3];
+    //print_arr(alldist, 2 * basepix->size);
     for (int j = 0; j < k; j ++){
+        //RGB1[0] = (image->tab[(int) alldist[j]]);
+        //RGB1[1] = image->tab[(int) alldist[j] + 1];
+        //RGB1[2] = image->tab[(int) alldist[j] + 2];
+        //hex += rgb_to_hex(RGB1);
+        printf("%f\n", alldist[j]);
         RGB[0] += image->tab[(int) alldist[j]];
         RGB[1] += image->tab[(int) alldist[j] + 1];
         RGB[2] += image->tab[(int) alldist[j] + 2];
+        printf("RGB%d: %d, %d, %d pixelk: %d\n", j, RGB[0], RGB[1], RGB[2], i);
     }
+    assert(i < 25000);
     //printf("RGBpre: %d, %d, %d\n", RGB[0], RGB[1], RGB[2]);
     //printf("        2\n");
+    //hex /= k;
     for (int j = 0; j < 3; j ++){
         RGB[j] = RGB[j] / k;
     }
     //printf("RGBpost: %d, %d, %d, %d\n", RGB[0], RGB[1], RGB[2], k);
     //printf("        3\n");
+    //hex_to_rgb(RGB, hex);
     free(alldist);  //No memory leak
     return RGB;
 }
@@ -81,7 +91,7 @@ void full_apply(img* image, int k, int bwidth, int bheigth){
     float coef = image->width / bwidth;
     //Find all already made pixels
     pixlist* basepix = malloc(sizeof(pixlist));
-    basepix->size = bwidth * bheigth;//excelent question
+    basepix->size = bwidth * bheigth;
     basepix->coord = malloc(basepix->size * sizeof(int));
     //printf("    pre-basepix\n");
     for (size_t i = 0; i < basepix->size; i ++){
@@ -101,6 +111,7 @@ void full_apply(img* image, int k, int bwidth, int bheigth){
             for (int t = 0; t < 3; t ++){
                 image->tab[i * image->channels + t] = RGB[t];
             }
+            //assert(0);
             free(RGB);  //No memory leak
         }
     }
@@ -110,19 +121,20 @@ void full_apply(img* image, int k, int bwidth, int bheigth){
 
 void print_arr(float* arr, int n){
     for (int i = 0; i < n; i ++){
-        //printf("%f, ", arr[i]);
+        printf("%f, ", arr[i]);
     }
+    printf("\n");
 }
 
 void main(){
     img* base = img_open("smalltest.png");
     //printf("ouverture\n");
-    img* upscaled = expand(base, 2 * base->width);
-    //printf("upscale\n");
-    //printf("bwidth * bheigth: %d", base->height * base->width);
+    img* upscaled = expand(base, 1.2 * base->width);
+    printf("upscale\n");
+    printf("bwidth * bheigth: %d", base->height * base->width);
     full_apply(upscaled, 5, base->width, base->height);
-    //printf("KNN\n");
+    printf("KNN\n");
     savesupr_img(upscaled, "test_up.png");
-    //printf("save\n");
+    printf("save\n");
     free_img(base);
 }
