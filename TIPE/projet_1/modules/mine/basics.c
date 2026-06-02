@@ -66,3 +66,15 @@ int maxf(float* arr, int n){
     }
     return id;
 }
+
+int rgb_to_hex(int* RGB){
+    /*Converts RGB into hexadecimal*/
+    return (RGB[0]<<16) | (RGB[1]<<8) | RGB[2];
+}
+
+void hex_to_rgb(int* RGB, int hex){
+    /*Converts hexadecimal into RGB*/
+    RGB[0] = ((hex >> 16) & 0xFF) / 255.0;  // Extract the RR byte
+    RGB[1] = ((hex >> 8) & 0xFF) / 255.0;   // Extract the GG byte
+    RGB[2] = ((hex) & 0xFF) / 255.0;        // Extract the BB byte
+}

@@ -9,4 +9,6 @@ void coor(int i, int width, int point[2]);  //done
 int ind(int x, int y, int width);   //done
 int minf(float* arr, int n);    //done
 int maxf(float* arr, int n);    //done
+int rgb_to_hex(int* RGB);   //In StackOverflow we trust
+void hex_to_rgb(int* RGB, int hex); //In StackOverflow we trust
 #endif
