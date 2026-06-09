@@ -11,6 +11,8 @@ typedef struct {
 } pixlist;
 
 void print_arr(float* arr, int n);  //done but will be deleted 
+void print_arr2(float* arr, int n);
+void print_arri(int* arr, int n);
 
 void select_ksort(float* arr, int n, int k);  //done (has been modified since so go look it up if smth's wrong)
 int* KNN(int i, img* image, pixlist* basepix, int k);    //needs testing
@@ -20,18 +22,22 @@ void select_ksort(float* arr, int n, int k){
     /*Will sort the first k index of arr
     Needed: k <= n
     */
+    //printf("size:%d\n", (int) sizeof(arr) / sizeof(float));
+    //printf("prem:%f, der:%f\n", arr[0], arr[2 * n - 1]);
     for(int i = 0; i < k; i ++){
-        int min_id = minf(arr + n + i, n - i) + i;
+        int min_id = minf(arr + n + i, n - i) + n + i;
         ////printf("            min\n");
         //First we sort the distance
         float mini = arr[min_id];
-        arr[2 * min_id] = arr[2 * i];
-        arr[2 * i] = mini;
+        //printf("mini:%d, min_id:%d\n", mini, min_id);
+        arr[min_id] = arr[n + i];
+        arr[n + i] = mini;
         //Then we sort the position with what we did for distances
-        mini = arr[min_id];
-        arr[min_id] = arr[i];
+        mini = arr[min_id - n];
+        arr[min_id - n] = arr[i];
         arr[i] = mini;
     }
+    //assert(0);
 }
 
 int* KNN(int i, img* image, pixlist* basepix, int k){
@@ -50,7 +56,10 @@ int* KNN(int i, img* image, pixlist* basepix, int k){
         alldist[basepix->size + j] = dist(point[0], point[1], npoint[0], npoint[1]); //We reverse the indices so that we can have an array of distances
     }
     //Sorting
+    //printf("size_pre:%ld\n", (size_t) sizeof(alldist) / sizeof(float));
     select_ksort(alldist, basepix->size, k);
+    //print_arr2(alldist, basepix->size);
+    //assert(0);
     //Taking the average color found
     //printf("        pre-average\n");
     int* RGB = malloc(3 * sizeof(int));
@@ -61,18 +70,20 @@ int* KNN(int i, img* image, pixlist* basepix, int k){
     //int hex = 0;
     //int RGB1[3];
     //print_arr(alldist, 2 * basepix->size);
+    //printf("pixel:%d\n", i);
     for (int j = 0; j < k; j ++){
         //RGB1[0] = (image->tab[(int) alldist[j]]);
         //RGB1[1] = image->tab[(int) alldist[j] + 1];
         //RGB1[2] = image->tab[(int) alldist[j] + 2];
         //hex += rgb_to_hex(RGB1);
-        printf("%f\n", alldist[j]);
+        //printf("%f\n", alldist[j]);
+        //printf("    indice:%f, dist:%f\n", alldist[j], alldist[basepix->size + j]);
         RGB[0] += image->tab[(int) alldist[j]];
         RGB[1] += image->tab[(int) alldist[j] + 1];
         RGB[2] += image->tab[(int) alldist[j] + 2];
-        printf("RGB%d: %d, %d, %d pixelk: %d\n", j, RGB[0], RGB[1], RGB[2], i);
+        //printf("RGB%d: %d, %d, %d pixelk: %d\n", j, RGB[0], RGB[1], RGB[2], i);
     }
-    assert(i < 25000);
+    //assert(i < 25000);
     //printf("RGBpre: %d, %d, %d\n", RGB[0], RGB[1], RGB[2]);
     //printf("        2\n");
     //hex /= k;
@@ -100,12 +111,14 @@ void full_apply(img* image, int k, int bwidth, int bheigth){
         basepix->coord[i] = new_i;
         ////printf("j: %d, coordbasepix: %d\n", j, basepix->coord[j]);
     }
+    //print_arri(basepix->coord, basepix->size);
     //printf("    pre-KNN\n");
     //Apply KNN to all other pixels
+    size_t j = 0;
     for (size_t i = 0; i < img_size; i ++){
         //printf("%d, ", i);
-        if (image->tab[i * image->channels] == '\0'){
-            //printf("\n");
+        if(basepix->coord[j] != i){
+            //printf("basepix:%d, i: %d\n", basepix->coord[j], i);
             int* RGB = KNN(i, image, basepix, k);
             //printf("RGB: %d, %d, %d pixelk: %d\n", RGB[0], RGB[1], RGB[2], i);
             for (int t = 0; t < 3; t ++){
@@ -113,6 +126,9 @@ void full_apply(img* image, int k, int bwidth, int bheigth){
             }
             //assert(0);
             free(RGB);  //No memory leak
+        } else{
+            //printf("nope\n");
+            j ++;
         }
     }
     free(basepix->coord);
@@ -126,12 +142,26 @@ void print_arr(float* arr, int n){
     printf("\n");
 }
 
+void print_arri(int* arr, int n){
+    for (int i = 0; i < n; i ++){
+        printf("%d, ", arr[i]);
+    }
+    printf("\n");
+}
+
+void print_arr2(float* arr, int n){
+    for (int i = 0; i < n; i ++){
+        printf("indice:%f, dist:%f\n", arr[i], arr[n + i]);
+    }
+    printf("\n");
+}
+
 void main(){
     img* base = img_open("smalltest.png");
     //printf("ouverture\n");
     img* upscaled = expand(base, 1.2 * base->width);
     printf("upscale\n");
-    printf("bwidth * bheigth: %d", base->height * base->width);
+    printf("bwidth * bheigth: %d\n", base->height * base->width);
     full_apply(upscaled, 5, base->width, base->height);
     printf("KNN\n");
     savesupr_img(upscaled, "test_up.png");
