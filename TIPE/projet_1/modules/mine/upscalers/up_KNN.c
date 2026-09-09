@@ -21,7 +21,7 @@ void print_arri(int* arr, int n);
 
 void select_ksort(distlist* arr, int n, int k);  //done (has been modified since so go look it up if smth's wrong)
 int* KNN(int i, img* image, pixlist* basepix, int k);    //needs testing
-void full_apply(img* image, int k, int bwidth, int bheigth);    //to do
+void full_apply(img* image, int k, int bwidth, int bheigth);    //done
 
 void select_ksort(distlist* arr, int n, int k){
     /*Will sort the first k index of arr
