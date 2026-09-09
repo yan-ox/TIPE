@@ -15,7 +15,7 @@ typedef struct {
     float* dist;
 } distlist;
 
-void print_arr(float* arr, int n);  //done but will be deleted 
+void print_arr(float* arr, int n);  //done but will be deleted
 void print_arr2(float* arr, int n);
 void print_arri(int* arr, int n);
 
@@ -76,7 +76,8 @@ int* KNN(int i, img* image, pixlist* basepix, int k){
     //printf("        1\n");
     //int hex = 0;
     //int RGB1[3];
-    if(i >= 15800){
+    //printf("pixel:%d\n", i);
+    if(i >= 30800){
         /*printf("pixel:%d\n", i);
         printf("coord:");
         print_arri(alldist->coord, basepix->size);
@@ -93,10 +94,13 @@ int* KNN(int i, img* image, pixlist* basepix, int k){
         RGB[0] += image->tab[alldist->coord[j]];
         RGB[1] += image->tab[alldist->coord[j] + 1];
         RGB[2] += image->tab[alldist->coord[j] + 2];
-        if (i >= 15800 && j==0 /*&& (RGB[0] != 255 || RGB[1] != 255 || RGB[2] != 255)*/){
-            //printf("RGB%d: %d, %d, %d pixelk: %d\n", j, RGB[0], RGB[1], RGB[2], i);
+        if (i >= 36180 /*&& j==0 && (RGB[0] != 255 || RGB[1] != 255 || RGB[2] != 255)*/){
+            //printf("RGB%d: %d, %d, %d pixelk: %d\n", j, RGB[0] -255 * j, RGB[1]-255 * j, RGB[2]-255 * j, i);
             //assert(0);
         }
+    }
+    if (i >= 36180 /*&& j==0 && (RGB[0] != 255 || RGB[1] != 255 || RGB[2] != 255)*/){
+        //assert(0);
     }
     //assert(i < 25000);
     //printf("RGBpre: %d, %d, %d\n", RGB[0], RGB[1], RGB[2]);
@@ -180,7 +184,9 @@ void main(){
     img* upscaled = expand(base, 1.2 * base->width);
     printf("upscale\n");
     printf("bwidth * bheigth: %d\n", base->height * base->width);
-    printf("RGBb: %d, %d, %d\n", upscaled->tab[15804], upscaled->tab[15804 + 1], upscaled->tab[15804 + 2]);
+    printf("RGBb: %d, %d, %d\n", upscaled->tab[30801], upscaled->tab[30801 + 1], upscaled->tab[30801 + 2]);
+    //savesupr_img(upscaled, "test_up.png");
+    //print_img(upscaled);
     full_apply(upscaled, 12, base->width, base->height);
     printf("KNN\n");
     savesupr_img(upscaled, "test_up.png");
