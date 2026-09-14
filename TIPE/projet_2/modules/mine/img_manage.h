@@ -13,4 +13,5 @@ void print_img(img* image);
 void free_img(img* image); 
 img* expand(img* image, int nwidth);
 void savesupr_img(img* image, char* name);
+img* make_expand(img* image, int nwidth);
 #endif

@@ -62,9 +62,9 @@ void free_img(img* image){
 }
 
 img* expand(img* image, int nwidth){
-    /*Resize the image to the desired size while keeping the previous pixels in place
-    Only the the width will be given, the length will be calculated to keep the proportions
-    The new size has to be bigger than the original one, else a crash will occur
+    /*Resize the image to the desired size while keeping the previous pixels in place.
+    Only the the width will be given, the length will be calculated to keep the proportions.
+    The new size has to be bigger than the original one, else a crash will occur.
     */
     assert(image->width < nwidth && "New size must be bigger than the original one");  //Verifies the new size is bigger then the former
     float coef = (float)nwidth / image->width; //Proportionality coefficient
@@ -88,6 +88,22 @@ img* expand(img* image, int nwidth){
             }
         }
     }
+    //
+    return image = output;
+}
+
+img* make_expand(img* image, int nwidth){
+    /*Makes a new empty image scaled to the desired size. 
+    Only the the width will be given, the length will be calculated to keep the proportions.
+    The new size has to be bigger than the original one, else a crash will occur.
+    */
+    assert(image->width < nwidth && "New size must be bigger than the original one");  //Verifies the new size is bigger then the former
+    float coef = (float)nwidth / image->width; //Proportionality coefficient
+    img* output = malloc(sizeof(img));  //New image initialisation
+    output->width = (int) nwidth;
+    output->height= (int) (image->height * coef);
+    output->channels = image->channels;
+    output->tab = malloc(output->width * output->height * output->channels * sizeof(*output->tab));
     //
     return image = output;
 }
