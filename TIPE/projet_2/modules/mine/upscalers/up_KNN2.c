@@ -48,7 +48,7 @@ int* create_nearest(int width, int height, int max_rad, int* coord, int k){
                     p = (r * 2) + 1;
                 }else{
                     int nx = (coord[0] - r) + j;
-                    int ny = (coord[0] - r) + p;
+                    int ny = (coord[1] - r) + p;
                     //Verifies that the pixels are within the image
                     if(nx >= 0 && ny >= 0 && nx < width && ny < height){
                         nearest[i] = nx;
