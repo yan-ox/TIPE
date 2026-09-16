@@ -158,19 +158,20 @@ void full_apply(img* base, img* out, int k, float coef){
 
 
 void main(){
-    img* base = img_open("Gaelle.png");
+    img* base = img_open("pixelart.png");
     int test_bcoord[2] = {2, 2};
     //int* test_coord = create_nearest(50, test_bcoord, 25);
     //print_mult_coord(test_coord, 25);
     float coef = 2.0;
+    int k = 9;
     img* upscaled = make_expand(base, coef * base->width);
     printf("expand\n");
     printf("size: %d\n", upscaled->width * upscaled->height);
     //printf("bwidth * bheigth: %d\n", base->height * base->width);
     //printf("RGBb: %d, %d, %d\n", upscaled->tab[30801], upscaled->tab[30801 + 1], upscaled->tab[30801 + 2]);
-    full_apply(base, upscaled, 9, coef);
+    full_apply(base, upscaled, k, coef);
     printf("KNN\n");
-    savesupr_img(upscaled, "test_up.png");
+    savesupr_img(upscaled, "pixelart_2xup9.png");
     printf("save\n");
     free_img(upscaled);
     //free(test_coord);
