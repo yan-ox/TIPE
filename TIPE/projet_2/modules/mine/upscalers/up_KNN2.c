@@ -75,14 +75,18 @@ int* create_nearest(int width, int height, int max_rad, int* coord, int k){
 void KNN(img* base, img* out, size_t i, int k, float coef){
     /*Applies KNN to a selected pixel
     */
+    //
+    //Calculates the coordinates of the selected pixel
     int* coordb = malloc(2 * sizeof(int));
     coor(i, out->width, coordb);
     coordb[0] = (int)(coordb[0] / coef);
     coordb[1] = (int)(coordb[1] / coef);
     //printf("x:%d, y:%d\n", coordb[0], coordb[1]);
+    //
     //Finds the closest pixels
     int* nearest = create_nearest(base->width, base->height, base->width / 2, coordb, k);
     //print_mult_coord(nearest, k);
+    //
     //Takes the average of the pixels
     float RGB[3] = {0, 0, 0};
     for(int j = 0; j < k; j++){
@@ -90,7 +94,8 @@ void KNN(img* base, img* out, size_t i, int k, float coef){
         RGB[1] += base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + 1];
         RGB[2] += base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + 2];
     }
-    //And inputs the average into the image
+    //
+    //Puts the average in the selected pixel
     out->tab[i * out->channels] = RGB[0] / k;
     out->tab[i * out->channels + 1] = RGB[1] / k;
     out->tab[i * out->channels + 2] = RGB[2] / k;
@@ -108,7 +113,7 @@ void full_apply(img* base, img* out, int k, float coef){
     size_t otp_size = out->width * out->height;
     //Will be used for the unknown pixels
     int* coordo = malloc(2 * sizeof(int));
-    //Will be used for the known pixels
+    //Will be used for known pixels
     int* coordbo = malloc(2 * sizeof(int));
     //
     for (size_t ib = 0; ib < base_size; ib ++){
@@ -139,17 +144,14 @@ void full_apply(img* base, img* out, int k, float coef){
             io ++;
         }
         //Then fills the known pixel
-        if(ibo < otp_size){
-            for (int j = 0; j < base->channels; j ++){
-                //Fills the known pixels to designated places
-                out->tab[ibo * out->channels + j] = base->tab[ib * out->channels + j];
-            }
+        for (int j = 0; j < base->channels; j ++){
+            //Fills the known pixels to designated places
+            out->tab[ibo * out->channels + j] = base->tab[ib * out->channels + j];
         }
         //assert(ib!=101250);
-        //
-        free(coordo);
-        free(coordbo);
     }
+    free(coordo);
+    free(coordbo);
 }
 
 
@@ -163,7 +165,7 @@ void main(){
     float coef = 2.0;
     img* upscaled = make_expand(base, coef * base->width);
     printf("expand\n");
-    printf("size: %d", upscaled->width * upscaled->height);
+    printf("size: %d\n", upscaled->width * upscaled->height);
     //printf("bwidth * bheigth: %d\n", base->height * base->width);
     //printf("RGBb: %d, %d, %d\n", upscaled->tab[30801], upscaled->tab[30801 + 1], upscaled->tab[30801 + 2]);
     full_apply(base, upscaled, 9, coef);
