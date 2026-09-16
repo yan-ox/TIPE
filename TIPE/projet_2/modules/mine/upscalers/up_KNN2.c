@@ -158,7 +158,7 @@ void full_apply(img* base, img* out, int k, float coef){
 
 
 void main(){
-    img* base = img_open("pixelart.png");
+    img* base = img_open("augustin.jpg");
     int test_bcoord[2] = {2, 2};
     //int* test_coord = create_nearest(50, test_bcoord, 25);
     //print_mult_coord(test_coord, 25);
@@ -171,7 +171,7 @@ void main(){
     //printf("RGBb: %d, %d, %d\n", upscaled->tab[30801], upscaled->tab[30801 + 1], upscaled->tab[30801 + 2]);
     full_apply(base, upscaled, k, coef);
     printf("KNN\n");
-    savesupr_img(upscaled, "pixelart_2xup9.png");
+    savesupr_img(upscaled, "augustin_2xup9.png");
     printf("save\n");
     free_img(upscaled);
     //free(test_coord);
