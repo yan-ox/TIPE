@@ -88,17 +88,20 @@ void KNN(img* base, img* out, size_t i, int k, float coef){
     //print_mult_coord(nearest, k);
     //
     //Takes the average of the pixels
-    float RGB[3] = {0, 0, 0};
+    float* RGB = malloc(out->channels * sizeof(float));
+    for(int l = 0; l < out->channels; l ++){
+            RGB[l] = 0;
+        }
     for(int j = 0; j < k; j++){
-        RGB[0] += base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels];
-        RGB[1] += base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + 1];
-        RGB[2] += base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + 2];
+        for(int l = 0; l < out->channels; l ++){
+            RGB[l] += base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l];
+        }
     }
     //
     //Puts the average in the selected pixel
-    out->tab[i * out->channels] = RGB[0] / k;
-    out->tab[i * out->channels + 1] = RGB[1] / k;
-    out->tab[i * out->channels + 2] = RGB[2] / k;
+    for(int l = 0; l < out->channels; l ++){
+        out->tab[i * out->channels + l] = RGB[l] / k;
+    }
     free(coordb);
     free(nearest);
 }
@@ -158,7 +161,7 @@ void full_apply(img* base, img* out, int k, float coef){
 
 
 void main(){
-    img* base = img_open("augustin.jpg");
+    img* base = img_open("pixel_parrot.png");
     int test_bcoord[2] = {2, 2};
     //int* test_coord = create_nearest(50, test_bcoord, 25);
     //print_mult_coord(test_coord, 25);
@@ -167,11 +170,12 @@ void main(){
     img* upscaled = make_expand(base, coef * base->width);
     printf("expand\n");
     printf("size: %d\n", upscaled->width * upscaled->height);
+    printf("channel: %d\n", upscaled->channels);
     //printf("bwidth * bheigth: %d\n", base->height * base->width);
     //printf("RGBb: %d, %d, %d\n", upscaled->tab[30801], upscaled->tab[30801 + 1], upscaled->tab[30801 + 2]);
     full_apply(base, upscaled, k, coef);
     printf("KNN\n");
-    savesupr_img(upscaled, "augustin_2xup9.png");
+    savesupr_img(upscaled, "pixel_parrot_2xup9.png");
     printf("save\n");
     free_img(upscaled);
     //free(test_coord);
