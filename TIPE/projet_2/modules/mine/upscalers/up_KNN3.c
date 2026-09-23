@@ -6,12 +6,15 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <math.h>
-#include <string.h>
 
 void KNN(img* base, img* out, size_t i, int k, float coef); //Needs testing
 int* create_nearest(int width, int height, int max_rad, int* coord, int k); //works
 void full_apply(img* base, img* out, int k, float coef); //WIP
+bool float_equal(float a, float b, float e);
 
+bool float_equal(float a, float b, float e){
+    return fabs(a - b) < e;
+}
 
 void print_pixel(img* im, size_t i){
     printf("RGB: (%d, %d, %d)\n", im->tab[i], im->tab[i+1], im->tab[i+2]);
@@ -23,11 +26,6 @@ void print_mult_coord(int* coords, int n){
         printf("%d, %d", coords[i], coords[n + i]);
         printf("]\n");
     }
-}
-
-char* create_newname(char* old, float coef, int k){
-    char* new = malloc(strlen(old) * sizeof(char));
-
 }
 
 int* create_nearest(int width, int height, int max_rad, int* coord, int k){
@@ -92,16 +90,25 @@ void KNN(img* base, img* out, size_t i, int k, float coef){
     //Takes the average of the pixels
     float* RGB = malloc(out->channels * sizeof(float));
     for(int l = 0; l < out->channels; l ++){
-            RGB[l] = 0;
-        }
+        RGB[l] = 0;
+    }
+    float cpt_coef = 0;
     for(int j = 0; j < k; j++){
         for(int l = 0; l < out->channels; l ++){
-            RGB[l] += base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l];
+            if(l < 3){
+                RGB[l] += (1 / ((float) j + 1)) * base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l];
+            }else{
+                RGB[l] += base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l];
+            }
         }
+        cpt_coef += (1 / ((float) j + 1));
     }
     //
     //Puts the average in the selected pixel
     for(int l = 0; l < out->channels; l ++){
+        if(l < 3){
+            out->tab[i * out->channels + l] = RGB[l] / (cpt_coef);
+        }
         out->tab[i * out->channels + l] = RGB[l] / k;
     }
     free(coordb);
@@ -162,17 +169,13 @@ void full_apply(img* base, img* out, int k, float coef){
 
 
 
-void main(int argc,char *argv[]){
-    assert(argc == 4 && "Invalid input: fichier.png/jpg coef k");
-    char* base_name = argv[1];
-    float coef = atof(argv[2]);
-    int k = atoi(argv[3]);
-    img* base = img_open(base_name);
+void main(){
+    img* base = img_open("pixel_birb.png");
     int test_bcoord[2] = {2, 2};
     //int* test_coord = create_nearest(50, test_bcoord, 25);
     //print_mult_coord(test_coord, 25);
-    //float coef = 2.0;
-    //int k = 1;
+    float coef = 2.0;
+    int k = 4;
     img* upscaled = make_expand(base, coef * base->width);
     printf("expand\n");
     printf("size: %d\n", upscaled->width * upscaled->height);
@@ -181,8 +184,7 @@ void main(int argc,char *argv[]){
     //printf("RGBb: %d, %d, %d\n", upscaled->tab[30801], upscaled->tab[30801 + 1], upscaled->tab[30801 + 2]);
     full_apply(base, upscaled, k, coef);
     printf("KNN\n");
-
-    savesupr_img(upscaled, "pixel_parrot_2xup9.png");
+    savesupr_img(upscaled, "pixel_birb_2xup4_sideb.png");
     printf("save\n");
     free_img(upscaled);
     //free(test_coord);
