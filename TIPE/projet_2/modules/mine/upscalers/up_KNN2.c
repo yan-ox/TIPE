@@ -8,9 +8,10 @@
 #include <math.h>
 #include <string.h>
 
-void KNN(img* base, img* out, size_t i, int k, float coef); //Needs testing
+void KNN(img* base, img* out, size_t i, int k, float coef); //works
 int* create_nearest(int width, int height, int max_rad, int* coord, int k); //works
-void full_apply(img* base, img* out, int k, float coef); //WIP
+void full_apply(img* base, img* out, int k, float coef); //works
+char* create_newname(char* old, float coef, int k); //works
 
 
 void print_pixel(img* im, size_t i){
@@ -26,8 +27,75 @@ void print_mult_coord(int* coords, int n){
 }
 
 char* create_newname(char* old, float coef, int k){
-    char* new = malloc(strlen(old) * sizeof(char));
-
+    /*Is in charge of creating a new name for the output file
+    considering the coef used and the k argument of KNN
+    */
+    int size_old = strlen(old) - 1;
+    int size_coef_i = 1;
+    int size_coef_d = 0;
+    int size_k = 1;
+    int i = 10;
+    // Calculates the space needed for k
+    while((k / i) != 0){
+        size_k += 1;
+        i *= 10;
+    }
+    i = 10; // Just reseting i here
+    // Calculates the space needed for coef
+    while((coef / i) >= 1. || (coef * (i/10)) - (int)(coef * (i/10)) >= 0.001){
+        if((coef / i) >= 1.){size_coef_i += 1;}
+        if((coef * (i/10)) - (int)(coef * (i/10)) >= 0.001){size_coef_d += 1;}    
+        i *= 10;
+    }
+    int size_coef = size_coef_i + size_coef_d + (size_coef_d >= 1);
+    // Allocate the memory needed for the new name
+    // old_name + '_' + coef + 'xup' + k + 'KNN.png'
+    int new_size = (size_old + 1 + size_coef + 3 + size_k + 7 + 1) * sizeof(char);
+    char* new = malloc(new_size);
+    //
+    // Fills up the previous name
+    for(int j = 0; j < size_old; j ++){
+        new[j] = old[j];
+    }
+    int j = size_old; // Here j will serve to know how far we are in the word
+    int cpt = size_old; // Here cpt will serv to know what we already put in the name
+    //
+    new[j] = '_';
+    j ++;
+    cpt++;
+    //
+    char* coef_char = malloc((size_coef) * sizeof(char));
+    gcvt(coef, size_coef_d + size_coef_i, coef_char);
+    while(j < cpt + size_coef){
+        new[j] = coef_char[j - cpt];
+        j ++;
+    }
+    free(coef_char);
+    cpt += size_coef;
+    //
+    char xup[4] = "xup\0";
+    while(j < cpt + 3){
+        new[j] = xup[j - cpt];
+        j ++;
+    }
+    cpt += 3;
+    //
+    char* k_char = malloc(size_k * sizeof(char));
+    itoa(k, k_char, 10);
+    while(j < cpt + size_k){
+        new[j] = k_char[j - cpt];
+        j ++;
+    }
+    free(k_char);
+    cpt += size_k;
+    //
+    char knn[8] = "KNN.png\0";
+    while(j < new_size - 1){
+        new[j] = knn[j - cpt];
+        j ++;
+    }
+    new[j] = '\0';
+    return new;
 }
 
 int* create_nearest(int width, int height, int max_rad, int* coord, int k){
@@ -73,7 +141,6 @@ int* create_nearest(int width, int height, int max_rad, int* coord, int k){
     return nearest;
 }
 
-
 void KNN(img* base, img* out, size_t i, int k, float coef){
     /*Applies KNN to a selected pixel
     */
@@ -83,11 +150,9 @@ void KNN(img* base, img* out, size_t i, int k, float coef){
     coor(i, out->width, coordb);
     coordb[0] = (int)(coordb[0] / coef);
     coordb[1] = (int)(coordb[1] / coef);
-    //printf("x:%d, y:%d\n", coordb[0], coordb[1]);
     //
     //Finds the closest pixels
     int* nearest = create_nearest(base->width, base->height, base->width / 2, coordb, k);
-    //print_mult_coord(nearest, k);
     //
     //Takes the average of the pixels
     float* RGB = malloc(out->channels * sizeof(float));
@@ -130,22 +195,15 @@ void full_apply(img* base, img* out, int k, float coef){
         coordo[1] = (int)(coordo[1] * coef);
         size_t io = ind(coordo[0], coordo[1], out->width) + 1;
         //
-        //printf("io:(%d, %d)\n", coordb[0], coordb[1]);
-        //
         //Next known pixel
         coor(ib, base->width, coordbo);
         coordbo[0] = (int)(coordbo[0] * coef);
         coordbo[1] = (int)(coordbo[1] * coef);
         size_t ibo = ind(coordbo[0], coordbo[1], out->width); 
         //
-        //printf("ibo:(%d, %d)\n", coordbo[0], coordbo[1]);
-        //printf("pre boucle io:%d, ibo: %d\n", io, ibo);
-        //
         //Fills pixels until we step on the known pixel's coordinates
         while(io < ibo && io < otp_size){
-            //printf("io:%d\n", io);
             KNN(base, out, io, k, coef);
-            //print_pixel(out, io);
             io ++;
         }
         //Then fills the known pixel
@@ -153,7 +211,6 @@ void full_apply(img* base, img* out, int k, float coef){
             //Fills the known pixels to designated places
             out->tab[ibo * out->channels + j] = base->tab[ib * out->channels + j];
         }
-        //assert(ib!=101250);
     }
     free(coordo);
     free(coordbo);
@@ -167,25 +224,29 @@ void main(int argc,char *argv[]){
     char* base_name = argv[1];
     float coef = atof(argv[2]);
     int k = atoi(argv[3]);
+    //
     img* base = img_open(base_name);
-    int test_bcoord[2] = {2, 2};
-    //int* test_coord = create_nearest(50, test_bcoord, 25);
-    //print_mult_coord(test_coord, 25);
-    //float coef = 2.0;
-    //int k = 1;
+    //
+    char * base_namev2 = malloc((strlen(base_name) - 4) * sizeof(char));
+    for(int i = 0; i < strlen(base_name) - 4; i ++){
+        base_namev2[i] = base_name[i];
+    }
+    char* new_name = create_newname(base_namev2, coef, k);
+    free(base_namev2);
+    //
     img* upscaled = make_expand(base, coef * base->width);
     printf("expand\n");
-    printf("size: %d\n", upscaled->width * upscaled->height);
-    printf("channel: %d\n", upscaled->channels);
-    //printf("bwidth * bheigth: %d\n", base->height * base->width);
-    //printf("RGBb: %d, %d, %d\n", upscaled->tab[30801], upscaled->tab[30801 + 1], upscaled->tab[30801 + 2]);
+    //
+    printf("output_size: %d\n", upscaled->width * upscaled->height);
+    //
     full_apply(base, upscaled, k, coef);
     printf("KNN\n");
-
-    savesupr_img(upscaled, "pixel_parrot_2xup9.png");
+    //
+    savesupr_img(upscaled, new_name);
     printf("save\n");
+    //
     free_img(upscaled);
-    //free(test_coord);
     free_img(base);
-    printf("freed\n");
+    free(new_name);
+    printf("free\n");
 }
