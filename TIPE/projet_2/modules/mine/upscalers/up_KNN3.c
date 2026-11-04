@@ -146,11 +146,10 @@ void KNN(img* base, img* out, size_t i, int k, float coef){
     */
     //
     //Calculates the coordinates of the selected pixel
-    int* coordb = malloc(2 * sizeof(int));  // Coordinates in new image
-    int* coordn = malloc(2 * sizeof(int));  // Coordinates in base image
-    coor(i, out->width, coordn);
-    coordb[0] = (int)(coordn[0] / coef);
-    coordb[1] = (int)(coordn[1] / coef);
+    int* coordb = malloc(2 * sizeof(int));  // Coordinates in base image
+    coor(i, out->width, coordb);
+    coordb[0] = (int)(coordb[0] / coef);
+    coordb[1] = (int)(coordb[1] / coef);
     //
     //Finds the closest pixels
     int* nearest = create_nearest(base->width, base->height, base->width / 2, coordb, k);
@@ -162,15 +161,14 @@ void KNN(img* base, img* out, size_t i, int k, float coef){
         }
     float coef_count = 0;
     for(int j = 0; j < k; j++){
-        float d = dist(coordn[0], coordn[1], nearest[j], nearest[j + k]);   // Calculates the distance to the i pixel
+        float d = dist(coordb[0], coordb[1], nearest[j], nearest[j + k]);   // Calculates the distance to the i pixel
         d = d * d;  // squares distance
         if(d < 1){
             // to not divide by 0 we arbitrary chose a coef for the closest pixel
             for(int l = 0; l < out->channels; l ++){
-                //printf("<1\n");
-                RGB[l] += 100000 * base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l]; // if the distance is bellow one, it's way more valued 
+                RGB[l] += 40 * base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l]; // if the distance is bellow one, it's way more valued 
             }
-            coef_count += 10000;
+            coef_count += 40;
         } else {
             for(int l = 0; l < out->channels; l ++){
                 RGB[l] += (1 / d) * base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l];  // Ponderates every pixel to its distance
