@@ -166,9 +166,9 @@ void KNN(img* base, img* out, size_t i, int k, float coef){
         if(d < 1){
             // to not divide by 0 we arbitrary chose a coef for the closest pixel
             for(int l = 0; l < out->channels; l ++){
-                RGB[l] += 40 * base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l]; // if the distance is bellow one, it's way more valued 
+                RGB[l] += 10 * base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l]; // if the distance is bellow one, it's way more valued 
             }
-            coef_count += 40;
+            coef_count += 10;
         } else {
             for(int l = 0; l < out->channels; l ++){
                 RGB[l] += (1 / d) * base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l];  // Ponderates every pixel to its distance
