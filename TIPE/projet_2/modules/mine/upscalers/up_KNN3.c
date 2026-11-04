@@ -50,7 +50,7 @@ char* create_newname(char* old, float coef, int k){
     int size_coef = size_coef_i + size_coef_d + (size_coef_d >= 1);
     // Allocate the memory needed for the new name
     // old_name + '_' + coef + 'xup' + k + 'KNN.png'
-    int new_size = (size_old + 1 + size_coef + 3 + size_k + 7 + 1) * sizeof(char);
+    int new_size = (size_old + 1 + size_coef + 3 + size_k + 7 + 7 + 1) * sizeof(char);
     char* new = malloc(new_size);
     //
     // Fills up the previous name
@@ -89,7 +89,7 @@ char* create_newname(char* old, float coef, int k){
     free(k_char);
     cpt += size_k;
     //
-    char knn[8] = "KNN.png\0";
+    char knn[15] = "KNN_side_b.png\0";
     while(j < new_size - 1){
         new[j] = knn[j - cpt];
         j ++;
@@ -146,10 +146,11 @@ void KNN(img* base, img* out, size_t i, int k, float coef){
     */
     //
     //Calculates the coordinates of the selected pixel
-    int* coordb = malloc(2 * sizeof(int));
-    coor(i, out->width, coordb);
-    coordb[0] = (int)(coordb[0] / coef);
-    coordb[1] = (int)(coordb[1] / coef);
+    int* coordb = malloc(2 * sizeof(int));  // Coordinates in new image
+    int* coordn = malloc(2 * sizeof(int));  // Coordinates in base image
+    coor(i, out->width, coordn);
+    coordb[0] = (int)(coordn[0] / coef);
+    coordb[1] = (int)(coordn[1] / coef);
     //
     //Finds the closest pixels
     int* nearest = create_nearest(base->width, base->height, base->width / 2, coordb, k);
@@ -161,18 +162,20 @@ void KNN(img* base, img* out, size_t i, int k, float coef){
         }
     float coef_count = 0;
     for(int j = 0; j < k; j++){
-        float d = dist(coordb[0], coordb[1], nearest[j], nearest[j + k]);   // Calculates the distance to the i pixel
+        float d = dist(coordn[0], coordn[1], nearest[j], nearest[j + k]);   // Calculates the distance to the i pixel
         d = d * d;  // squares distance
         if(d < 1){
+            // to not divide by 0 we arbitrary chose a coef for the closest pixel
             for(int l = 0; l < out->channels; l ++){
-                RGB[l] += 10 * base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l]; // if the distance is bellow one, it's way more valued 
+                //printf("<1\n");
+                RGB[l] += 100000 * base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l]; // if the distance is bellow one, it's way more valued 
             }
-            coef_count += 10;
+            coef_count += 10000;
         } else {
             for(int l = 0; l < out->channels; l ++){
-                RGB[l] += d * base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l];  // Ponderates every pixel to its distance
+                RGB[l] += (1 / d) * base->tab[ind(nearest[j], nearest[j + k], base->width) * out->channels + l];  // Ponderates every pixel to its distance
             }
-            coef_count += d;
+            coef_count += (1 / d);
         }
     }
     //
