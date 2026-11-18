@@ -224,6 +224,11 @@ void full_apply(img* base, img* out, int k, float coef){
             out->tab[ibo * out->channels + j] = base->tab[ib * out->channels + j];
         }
     }
+    size_t io = ind(coordo[0], coordo[1], out->width) + 1;
+    while(io < otp_size){
+        KNN(base, out, io, k, coef);
+        io ++;
+    }
     free(coordo);
     free(coordbo);
 }
