@@ -12,8 +12,8 @@ void print_mat_int(int** mat, int n, int m);
 void free_mat_float(float** mat, int n);
 void free_mat_int(int** mat, int n);
 
-void apply_pixel(img* image, float mat[3][3], int x, int y);
-void filter_image(img* image, float mat[3][3]);
+void apply_pixel(img* base, img* out, float mat[3][3], int x, int y);
+void filter_image(img* base, img* out, float mat[3][3]);
 char* create_newname(char* old);
 
 char *create_newname(char *old) {
@@ -68,26 +68,51 @@ void free_mat_int(int** mat, int n){
     free(mat);
 }
 
-void apply_pixel(img* image, float mat[3][3], int x, int y){
-    for(int k = 0; k < image->channels; k ++){
+void apply_pixel(img* base, img* out, float mat[3][3], int x, int y){
+    for(int k = 0; k < 3; k ++){
         int cpt = 0;
         for(int i = 0; i < 3; i ++){
             for(int j = 0; j < 3; j ++){
-                cpt += mat[i][j] * image->tab[ind(x + i - 1, y + j - 1, image->width) + k];
+                //printf("mat: %.2f\n", mat[i][j]);
+                cpt += (int) mat[i][j] * base->tab[ind(x + i - 1, y + j - 1, base->width) + k];
             }
         }
-        //printf("ici");
-        size_t i = ind(x, y, image->width);
-        image->tab[i + k] = cpt;
+        //printf("cpt: %d\n", cpt);
+        size_t i = ind(x, y, out->width);
+        out->tab[i + k] = cpt;
     }
 }
 
-void filter_image(img* image, float mat[3][3]){
-    for(int x = 1; x < image->width - 1; x ++){
-        for(int y = 1; y < image->height - 1; y ++){
-            apply_pixel(image, mat, x, y);
+void filter_image(img* base, img* out, float mat[3][3]){
+    int cpt = 0;
+    for(int x = 1; x < base->width - 1; x ++){
+        for(int y = 1; y < base->height - 1; y ++){
+            apply_pixel(base, out, mat, x, y);
+            cpt ++;
         }
     }
+    int peri = 2 * base->height + 2 * base->width - 4;
+    int taille = base->height * base->height;
+    printf("taille: %d, cpt: %d, peri: %d, meant: %d\n", taille, cpt, peri, taille - peri);
+}
+
+img* copy(img* image){
+    /*Copy image
+    */
+    img* output = malloc(sizeof(img));  //New image initialisation
+    output->width = image->width;
+    output->height= image->height;
+    output->channels = image->channels;
+    output->tab = malloc(output->width * output->height * output->channels * sizeof(*output->tab));
+    //
+    size_t img_size = image->width * image->height * image->channels;
+    //
+    for (size_t i = 0; i < img_size; i ++){
+        //Calculates the coordinates
+        output->tab[i] = image->tab[i];
+    }
+    //
+    return image = output;
 }
 
 void main(int argc, char* argv[]){
@@ -108,12 +133,14 @@ void main(int argc, char* argv[]){
     }
     char* new_name = create_newname(base_namev2);
     free(base_namev2);
-    printf("newname");
+    printf("newname\n");
     //
-    filter_image(base, mat_test);
-    printf("filter");
+    img* out = copy(base);
     //
-    savesupr_img(base, new_name);
+    filter_image(base, out, mat_test);
+    printf("filter\n");
+    //
+    savesupr_img(out, new_name);
     printf("save\n");
     //
     free_img(base);
