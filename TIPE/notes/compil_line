@@ -1,3 +1,4 @@
 KNN: gcc ..\mine\upscalers\up_KNN.c o\basics.o o\img_manage.o -o KNN.exe
 KNN2: gcc ..\mine\upscalers\up_KNN2.c o\basics.o o\img_manage.o -o KNN2.exe
 KNN3: gcc ..\mine\upscalers\up_KNN3.c o\basics.o o\img_manage.o -o KNN3.exe
+high_pass: gcc ..\mine\filters\high_pass.c o\basics.o o\img_manage.o -o filter.exe
